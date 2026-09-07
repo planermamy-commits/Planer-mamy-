@@ -1,0 +1,1130 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#9f6970"><title>Planer Mamy</title><link rel="manifest" href="manifest.json"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f7f2ee;--card:#fffdfb;--ink:#493f3d;--muted:#8e7e79;--accent:#9f6970;--soft:#ead3d0;--line:#e7dad5;--gold:#a88449;--danger:#b45f63}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink)}
+header{position:sticky;top:0;z-index:4;background:rgba(247,242,238,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:14px 16px 10px}
+h1{font-size:23px;margin:0}.sub,.hint{font-size:12px;color:var(--muted)}main{max-width:820px;margin:auto;padding:14px 14px 110px}
+.section{display:none}.section.active{display:block}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 4px 16px rgba(74,56,51,.05)}
+.hero{background:linear-gradient(135deg,#fffdfb,#f0dcda)}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.metric{font-size:25px;font-weight:850}.label{font-size:11px;color:var(--muted)}.title2{font-size:18px;font-weight:800;margin:18px 0 10px}
+input,select,button.action{width:100%;padding:11px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font:inherit}
+button.action{background:var(--accent);color:white;border:0;font-weight:800}.secondary{background:white!important;color:var(--ink)!important;border:1px solid var(--line)!important}
+.list{display:flex;flex-direction:column;gap:8px}.item{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px}.item small{color:var(--muted)}
+.pill{font-size:11px;background:var(--soft);padding:4px 8px;border-radius:999px}.premium{background:#f3e8cf;color:#765b2c}.danger{width:auto;border:0;background:none;color:var(--danger);font-size:20px}
+.check{width:20px;height:20px}.done{text-decoration:line-through;opacity:.55}.empty{text-align:center;padding:14px;color:var(--muted);font-size:13px}
+.bar{height:9px;background:#eadfda;border-radius:999px;overflow:hidden}.bar>div{height:100%;background:var(--accent)}
+.lock{padding:18px;text-align:center;background:linear-gradient(135deg,#fffaf0,#f6ead0);border:1px solid #ead6aa;border-radius:18px}.lock b{display:block;font-size:18px;margin-bottom:6px}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:5;background:#fffdfb;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(6,1fr);gap:2px;padding:7px 5px calc(7px + env(safe-area-inset-bottom))}
+nav button{min-width:0;border:0;background:none;padding:9px 2px;border-radius:12px;color:var(--muted);font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}nav button.active{background:var(--soft);color:var(--ink);font-weight:800}
+canvas{max-height:260px}.price{font-size:30px;font-weight:900}.feature{padding:8px 0;border-bottom:1px solid var(--line)}
+
+.moreChip{display:inline-flex;align-items:center;gap:6px}
+@media (max-width:420px){
+  .metric{font-size:22px}
+  .row3{grid-template-columns:1fr}
+}
+
+.month-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.month-head input[type=month]{max-width:180px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.miniStat{background:rgba(255,255,255,.6);border:1px solid var(--line);border-radius:14px;padding:10px}
+.miniStat b{font-size:18px;display:block;margin-top:2px}
+.catRow{margin:9px 0}
+.catTop{display:flex;justify-content:space-between;gap:8px;font-size:13px}
+.catTrack{height:8px;background:#eee3df;border-radius:999px;overflow:hidden;margin-top:5px}
+.catFill{height:100%;background:var(--accent);border-radius:999px}
+.templateRow{display:grid;grid-template-columns:1.3fr .8fr .7fr auto;gap:6px;align-items:center}
+@media(max-width:560px){.templateRow{grid-template-columns:1fr 1fr}.templateRow button{grid-column:1/-1}.grid3{grid-template-columns:1fr 1fr 1fr}}
+
+
+.incomeTotalCard{background:linear-gradient(180deg,#fffaf7,#f7e8e8);border:1px solid var(--line);border-radius:18px;padding:14px}
+.incomeGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.incomeSource{background:#fffdfb;border:1px solid var(--line);border-radius:14px;padding:10px}
+.incomeSource .amount{font-weight:700;font-size:18px}
+.switchRow{display:flex;align-items:center;gap:8px;font-size:14px}
+.switchRow input{width:auto}
+@media(max-width:520px){.incomeGrid{grid-template-columns:1fr}}
+
+
+.budgetSplit{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.budgetPanel{background:#fffdfb;border:1px solid var(--line);border-radius:20px;padding:14px}
+.budgetPanel h3{margin:0 0 6px;font-size:19px}
+.budgetPanel .bigAmount{font-size:27px;font-weight:800;line-height:1.1}
+.budgetPanel .subtle{font-size:13px;opacity:.72;margin-top:4px}
+.incomePanel{background:linear-gradient(180deg,#fffdfb,#f8eeee)}
+.expensePanel{background:linear-gradient(180deg,#fffdfb,#f5f2f2)}
+.sectionBadge{display:inline-block;padding:4px 9px;border-radius:999px;border:1px solid var(--line);font-size:12px;margin-bottom:7px}
+@media(max-width:520px){.budgetSplit{grid-template-columns:1fr}}
+
+
+.today57{margin-top:12px}
+.today57grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.today57card{background:#fffdfb;border:1px solid var(--line);border-radius:18px;padding:13px;min-height:108px;display:flex;flex-direction:column;justify-content:space-between}
+.today57top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.today57card h3{margin:0;font-size:16px}
+.today57count{font-size:26px;font-weight:800;line-height:1}
+.today57hint{font-size:12px;opacity:.68;margin-top:5px}
+.today57card button{margin-top:10px}
+@media(max-width:360px){.today57grid{grid-template-columns:1fr}}
+
+.childProfileCard{background:#fffdfb;border:1px solid var(--line);border-radius:18px;padding:13px;margin-top:10px}
+.childProfileHead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.childProfileName{font-size:20px;font-weight:800}
+.childMiniGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.childMini{background:var(--soft);border-radius:14px;padding:10px}
+.childMini b{display:block;font-size:18px;margin-top:2px}
+.childEventItem{background:#fff;border:1px solid var(--line);border-radius:13px;padding:10px;margin-top:7px}
+.childEventMeta{font-size:12px;color:var(--muted);margin-top:3px}
+@media(max-width:420px){.childMiniGrid{grid-template-columns:1fr 1fr}}
+
+.kidHub{margin-top:10px}
+.kidHubGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kidHubTile{background:#fffdfb;border:1px solid var(--line);border-radius:18px;padding:14px;text-align:left;cursor:pointer}
+.kidHubTile.active{box-shadow:0 0 0 2px rgba(178,93,111,.22)}
+.kidHubTileName{font-size:20px;font-weight:800}
+.kidHubTileMeta{font-size:12px;color:var(--muted);margin-top:4px}
+.kidDetail58{display:none;margin-top:12px}
+.kidDetail58.active{display:block}
+.kidDetailHead{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.kidActionGrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-top:10px}
+.kidActionGrid button{font-size:12px;padding:9px 5px}
+.kidFormPanel{display:none;margin-top:10px}
+.kidFormPanel.active{display:block}
+@media(max-width:390px){.kidHubGrid{grid-template-columns:1fr 1fr}.kidActionGrid{grid-template-columns:1fr}}
+
+.kidAvatar{width:54px;height:54px;border-radius:50%;object-fit:cover;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.08);flex:0 0 auto}
+.kidAvatarFallback{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--soft);font-size:28px;flex:0 0 auto}
+.kidTileRow{display:flex;align-items:center;gap:10px}
+.kidEditPanel{display:none;margin-top:10px;background:#fffdfb;border:1px solid var(--line);border-radius:16px;padding:12px}
+.kidEditPanel.active{display:block}
+.kidPhotoLabel{display:flex;align-items:center;justify-content:center;min-height:46px;border:1px dashed var(--line);border-radius:12px;padding:8px;cursor:pointer;font-size:13px}
+.kidPhotoLabel input{display:none}
+
+.childExpenseRow{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#fff;border:1px solid var(--line);border-radius:13px;padding:10px;margin-top:7px}
+.childExpenseMain{min-width:0}
+.childExpenseMain b{display:block}
+.childExpenseMeta{font-size:12px;color:var(--muted);margin-top:3px}
+.childExpenseActions{display:flex;gap:6px;flex-shrink:0}
+.childExpenseActions button{padding:7px 9px;font-size:12px;border-radius:10px}
+.childExpenseEdit{display:none;background:#fffdfb;border:1px solid var(--line);border-radius:14px;padding:10px;margin-top:8px}
+.childExpenseEdit.active{display:block}
+</style></head>
+
+<body>
+<header>
+  <div style="display:flex;align-items:center;gap:10px">
+    <img src="icon-192.png?v=50" alt="" style="width:44px;height:44px;border-radius:13px;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+    <div style="min-width:0">
+      <h1 style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">Planer Mamy <span class="pill premium" id="planBadge">FREE</span> <span class="pill">v5.8.7</span></h1>
+      <div class="sub">Rodzinny organizer i kontrola domowego budżetu</div>
+    </div>
+  </div>
+</header>
+
+<div id="onboarding" style="position:fixed;inset:0;z-index:20;background:linear-gradient(180deg,#f7f2ee,#f2dfdf);display:none;align-items:center;justify-content:center;padding:20px">
+  <div class="card" style="max-width:420px;width:100%;text-align:center">
+    <img src="icon-192.png?v=50" style="width:92px;height:92px;border-radius:24px">
+    <div class="title2" style="margin:12px 0 4px">Witaj w Planerze Mamy</div>
+    <div class="hint">Dom, dzieci, budżet, posiłki i terminy w jednym miejscu.</div>
+    <button class="action" style="margin-top:16px" onclick="finishOnboarding()">Zaczynamy</button>
+  </div>
+</div>
+
+<main>
+<section id="home" class="section active">
+  <div class="card hero">
+    <div class="month-head">
+      <div>
+        <div class="label">Budżet miesiąca</div>
+        <div class="metric" id="balance">0 zł</div>
+      </div>
+      <input id="homeMonth" type="month" onchange="changeMonth(this.value)">
+    </div>
+    <div class="bar"><div id="budgetBar"></div></div>
+    <div class="hint" id="budgetHint">Dodaj pierwsze operacje.</div>
+    <div class="grid3" style="margin-top:10px">
+      <div class="miniStat"><div class="label">Dochody</div><b id="homeIncome">0 zł</b></div>
+      <div class="miniStat"><div class="label">Wydatki</div><b id="homeExpenses">0 zł</b></div>
+      <div class="miniStat"><div class="label">Zostało</div><b id="homeLeft">0 zł</b></div>
+    </div>
+    <div class="hint" id="daysLeftHint" style="margin-top:9px"></div>
+  </div>
+
+  
+
+  <div class="title2">Dzisiaj</div>
+  <div id="todayList" class="list"></div>
+
+  <div class="today57">
+  <div class="today57grid">
+    <div class="today57card" onclick="go('planner')">
+      <div class="today57top"><h3>✅ Zadania</h3><div class="today57count" id="today57TaskCount">0</div></div>
+      <div class="today57hint" id="today57TaskHint">Na dziś</div>
+      <button class="action secondary" onclick="event.stopPropagation();go('planner')">Otwórz planer</button>
+    </div>
+
+    <div class="today57card" onclick="go('calendar')">
+      <div class="today57top"><h3>📅 Terminy</h3><div class="today57count" id="today57EventCount">0</div></div>
+      <div class="today57hint" id="today57EventHint">Dziś i jutro</div>
+      <button class="action secondary" onclick="event.stopPropagation();go('calendar')">Kalendarz</button>
+    </div>
+
+    <div class="today57card" onclick="go('bills')">
+      <div class="today57top"><h3>🧾 Rachunki</h3><div class="today57count" id="today57BillCount">0</div></div>
+      <div class="today57hint" id="today57BillHint">Do zapłaty dziś/jutro</div>
+      <button class="action secondary" onclick="event.stopPropagation();go('bills')">Rachunki</button>
+    </div>
+
+    <div class="today57card" onclick="go('shopping')">
+      <div class="today57top"><h3>🛒 Zakupy</h3><div class="today57count" id="today57ShopCount">0</div></div>
+      <div class="today57hint" id="today57ShopHint">Na liście</div>
+      <button class="action secondary" onclick="event.stopPropagation();go('shopping')">Lista zakupów</button>
+    </div>
+  </div>
+</div>
+<div class="title2">Szybkie akcje</div>
+  <div class="grid2">
+    <button class="action secondary" onclick="quickExpense()">+ Wydatek</button>
+    <button class="action secondary" onclick="goIncome()">+ Dochód</button>
+    <button class="action secondary" data-page="planner" onclick="go('planner')">+ Zadanie</button>
+    <button class="action secondary" data-page="calendar" onclick="go('calendar')">+ Termin</button>
+    <button class="action secondary" data-page="bills" onclick="go('bills')">+ Rachunek</button>
+  </div>
+
+
+</section>
+
+<section id="budget" class="section">
+  <div class="card hero">
+    <div class="month-head">
+      <div><div class="label">Wybrany miesiąc</div><div class="title2" id="monthTitle" style="margin:2px 0 0"></div></div>
+      <input id="budgetMonth" type="month" onchange="changeMonth(this.value)">
+    </div>
+    <div class="grid3">
+      <div class="miniStat"><div class="label">Dochody</div><b id="income">0 zł</b></div>
+      <div class="miniStat"><div class="label">Wydatki</div><b id="expenses">0 zł</b></div>
+      <div class="miniStat"><div class="label">Zostało</div><b id="monthLeft">0 zł</b></div>
+    </div>
+  </div>
+
+  
+  
+  <div class="budgetSplit">
+    <div class="budgetPanel incomePanel">
+      <span class="sectionBadge">💰 DOCHODY</span>
+      <h3>Dochody miesiąca</h3>
+      <div class="bigAmount" id="incomeSplitTotal">0 zł</div>
+      <div class="subtle">Wypłata, 800+, alimenty, świadczenia i inne wpływy.</div>
+      <button class="action" style="margin-top:10px" onclick="goIncome()">+ Dodaj dochód</button>
+    </div>
+    <div class="budgetPanel expensePanel">
+      <span class="sectionBadge">🧾 WYDATKI</span>
+      <h3>Wydatki miesiąca</h3>
+      <div class="bigAmount" id="expenseSplitTotal">0 zł</div>
+      <div class="subtle">Zakupy, rachunki, dzieci, transport, zdrowie i inne koszty.</div>
+      <button class="action secondary" style="margin-top:10px" onclick="goExpense()">+ Dodaj wydatek</button>
+    </div>
+  </div>
+
+<div class="incomeTotalCard" style="margin-top:10px">
+    <div class="month-head">
+      <div>
+        <div class="label">Dochody miesiąca</div>
+        <div class="metric" id="incomeTotalBig">0 zł</div>
+      </div>
+      <button class="action" style="max-width:180px" onclick="document.getElementById('incomeFormCard').scrollIntoView({behavior:'smooth'})">+ Dodaj dochód</button>
+    </div>
+    <div class="hint">Tutaj widzisz wyłącznie dochody. Wydatki są liczone osobno poniżej.</div>
+    <div id="incomeSourcesSummary" class="incomeGrid" style="margin-top:10px"></div>
+  </div>
+
+  <div class="card" id="incomeFormCard" style="margin-top:10px">
+    <div class="title2" style="margin-top:0">💰 Dodaj dochód</div>
+    <div class="row3">
+      <select id="incomeCategory">
+        <option>Wypłata / umowa o pracę</option>
+        <option>800+</option>
+        <option>Alimenty</option>
+        <option>Świadczenia / zasiłki</option>
+        <option>Dodatkowy zarobek</option>
+        <option>Sprzedaż / zwrot</option>
+        <option>Inny dochód</option>
+      </select>
+      <input id="incomeAmountInput" type="number" step=".01" placeholder="Kwota">
+      <input id="incomeDateInput" type="date">
+    </div>
+    <div class="row" style="margin-top:8px">
+      <input id="incomeNoteInput" placeholder="Opis, np. wypłata za wrzesień">
+      <label class="switchRow"><input id="incomeRecurringInput" type="checkbox"> Powtarzaj co miesiąc</label>
+    </div>
+    <div style="margin-top:8px"><button class="action" onclick="addIncome()">Dodaj dochód</button></div>
+  </div>
+
+  <div class="title2">Dochody w miesiącu</div>
+  <div id="incomeList" class="list"></div><div class="title2">Stałe dochody</div><div id="recurringIncomeList" class="list"></div>
+
+<div class="card" style="margin-top:10px">
+    <div class="title2" style="margin-top:0">🧾 Dodaj wydatek</div>
+    <div class="row3">
+      <input id="bAmount" type="number" step=".01" placeholder="Kwota">
+      <select id="bCat"></select>
+      <input id="bDate" type="date">
+    </div>
+    <div class="row" style="margin-top:8px">
+      <input id="bNote" placeholder="Opis wydatku">
+      <div class="hint" style="display:flex;align-items:center;padding-left:4px">Ten wpis trafi wyłącznie do wydatków miesiąca.</div>
+    </div>
+    <div style="margin-top:8px"><button class="action" onclick="addBudget()">Dodaj</button></div>
+  </div>
+
+  <div class="card" style="margin-top:10px">
+    <div class="title2" style="margin-top:0">Miesięczny limit wydatków</div>
+    <div class="row"><input id="monthlyBudgetInput" type="number" step=".01" placeholder="Np. 5000 zł"><button class="action" onclick="setMonthlyBudget()">Zapisz limit</button></div>
+    <div class="bar" style="margin-top:10px"><div id="monthlyBudgetBar"></div></div>
+    <div class="hint" id="monthlyBudgetHint">Nie ustawiono limitu.</div>
+  </div>
+
+  <div class="card" style="margin-top:10px">
+    <div class="title2" style="margin-top:0">Stałe rachunki</div>
+    <div class="templateRow">
+      <input id="rbName" placeholder="Np. czynsz">
+      <input id="rbAmount" type="number" step=".01" placeholder="Kwota">
+      <input id="rbDay" type="number" min="1" max="31" placeholder="Dzień">
+      <button class="action" onclick="addRecurringBill()">Dodaj</button>
+    </div>
+    <div id="recurringBillList" class="list" style="margin-top:8px"></div>
+    <button class="action secondary" style="margin-top:10px" onclick="applyRecurring()">Dodaj stałe do wybranego miesiąca</button>
+    <div class="hint">Aplikacja nie doda ich drugi raz do tego samego miesiąca.</div>
+  </div>
+
+  <div class="card" style="margin-top:10px">
+    <div class="title2" style="margin-top:0">Na co poszły pieniądze?</div>
+    <div id="categorySummary"></div>
+  </div>
+
+  <div class="title2">Wydatki w miesiącu</div><div id="budgetList" class="list"></div>
+</section>
+
+<section id="kids" class="section">
+<div class="kidHub">
+  <div class="title2" style="margin-top:0">Dzieci</div>
+  <div id="kidHubGrid" class="kidHubGrid"></div>
+  <button class="action secondary" style="margin-top:10px" type="button" onclick="toggleKidLegacy()">+ Dodaj / edytuj profil dziecka</button>
+  <div id="kidSelectedDetail" class="kidDetail58"></div>
+  <div id="childExpenseEditPanel" class="childExpenseEdit">
+    <div class="title2" style="margin-top:0">✏️ Edytuj wydatek dziecka</div>
+    <input id="editChildExpenseId" type="hidden">
+    <div class="row">
+      <select id="editChildExpenseCat">
+        <option>Jedzenie</option>
+        <option>Szkoła / obiady</option>
+        <option>Ubrania</option>
+        <option>Zdrowie</option>
+        <option>Zajęcia</option>
+        <option>Zabawki</option>
+        <option>Inne</option>
+      </select>
+      <input id="editChildExpenseAmount" type="number" step=".01" placeholder="Kwota">
+    </div>
+    <div class="row" style="margin-top:8px">
+      <input id="editChildExpenseNote" placeholder="Opis wydatku">
+      <input id="editChildExpenseDate" type="date">
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button type="button" class="action" onclick="saveChildExpenseEdit()">Zapisz zmiany</button>
+      <button type="button" class="action secondary" onclick="closeChildExpenseEdit()">Anuluj</button>
+    </div>
+  </div>
+
+  <div id="kidEditPanel" class="kidEditPanel">
+    <div class="title2" style="margin-top:0">✏️ Edytuj profil dziecka</div>
+    <div class="row">
+      <input id="editKidName" placeholder="Imię dziecka">
+      <input id="editKidInfo" placeholder="Np. szkoła / żłobek">
+    </div>
+    <div class="row" style="margin-top:8px">
+      <input id="editKidBirth" type="date" aria-label="Data urodzenia">
+      <label class="kidPhotoLabel">📷 Zmień zdjęcie<input id="editKidPhoto" type="file" accept="image/jpeg,image/png,image/webp" onchange="prepareEditKidPhoto(this)"></label>
+    </div><div id="editKidPhotoStatus" class="hint" style="margin-top:6px"></div>
+    <div class="row" style="margin-top:8px">
+      <button class="action" onclick="saveKidProfileEdit()">Zapisz profil</button>
+      <button class="action secondary" onclick="closeKidEdit()">Anuluj</button>
+    </div>
+  </div>
+
+</div>
+<div id="kidLegacyWrap" style="display:none">
+
+  <div class="card">
+    <div class="row"><input id="kidName" placeholder="Imię dziecka"><input id="kidInfo" placeholder="Np. szkoła / żłobek"></div>
+    <div class="row" style="margin-top:8px">
+      <input id="kidBirth" type="date" aria-label="Data urodzenia">
+      <label class="kidPhotoLabel">📷 Dodaj zdjęcie<input id="kidPhoto" type="file" accept="image/jpeg,image/png,image/webp" onchange="prepareNewKidPhoto(this)"></label>
+    </div>
+    <div id="kidPhotoStatus" class="hint" style="margin-top:6px"></div>
+    <div style="margin-top:8px"><button class="action" onclick="addKid()">Dodaj profil</button></div>
+    <div class="hint">FREE: maksymalnie 2 profile dzieci.</div>
+  </div>
+  <div class="title2">Dzieci</div><div id="kidsList" class="list"></div>
+
+  <div class="card" style="margin-top:12px">
+    <div class="row3">
+      <select id="keKid"></select>
+      <select id="keCat"><option>Jedzenie</option><option>Pielęgnacja</option><option>Ubrania</option><option>Zdrowie</option><option>Szkoła / żłobek</option><option>Zajęcia</option><option>Rozrywka</option><option>Inne</option></select>
+      <input id="keAmount" type="number" step=".01" placeholder="Kwota">
+    </div>
+    <div class="row" style="margin-top:8px"><input id="keWhat" placeholder="Co kupiono / opłacono"><input id="keDate" type="date"></div>
+    <div style="margin-top:8px"><button class="action" onclick="addKidExpense()">Dodaj koszt dziecka</button></div>
+  </div>
+  <div class="title2">Ostatnie wydatki</div><div id="kidExpenseList" class="list"></div>
+
+  <div class="card" style="margin-top:12px">
+    <div class="title2" style="margin-top:0">📅 Termin dziecka</div>
+    <div class="row3">
+      <select id="kidEventKid"></select>
+      <select id="kidEventType">
+        <option>Lekarz / szczepienie</option>
+        <option>Szkoła / przedszkole</option>
+        <option>Zajęcia</option>
+        <option>Inne</option>
+      </select>
+      <input id="kidEventDate" type="date">
+    </div>
+    <div class="row" style="margin-top:8px">
+      <input id="kidEventTitle" placeholder="Np. pediatra, zebranie, trening">
+      <input id="kidEventTime" type="time">
+    </div>
+    <div style="margin-top:8px"><button class="action" onclick="addKidEvent()">Dodaj termin dziecka</button></div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <div class="title2" style="margin-top:0">📝 Notatka o dziecku</div>
+    <div class="row">
+      <select id="kidNoteKid"></select>
+      <input id="kidNoteText" placeholder="Np. szkoła, lekarz, ważna informacja">
+    </div>
+    <div style="margin-top:8px"><button class="action secondary" onclick="addKidNote()">Dodaj notatkę</button></div>
+  </div>
+
+  <div class="title2">Profile dzieci</div>
+  <div id="kidProfiles"></div>
+
+</div></section>
+
+<section id="shopping" class="section">
+  <div class="card"><div class="row"><input id="shopText" placeholder="Co kupić?"><select id="shopCat"><option>Spożywcze</option><option>Dom</option><option>Dzieci</option><option>Inne</option></select></div><div style="margin-top:8px"><button class="action" onclick="addShop()">Dodaj</button></div></div>
+  <div class="title2">Lista zakupów</div><div id="shopList" class="list"></div>
+</section>
+
+<section id="planner" class="section">
+  <div class="card"><div class="row"><input id="taskText" placeholder="Zadanie"><input id="taskDate" type="date"></div><div style="margin-top:8px"><button class="action" onclick="addTask()">Dodaj</button></div></div>
+  <div class="title2">Planer</div><div id="taskList" class="list"></div>
+</section>
+
+<section id="calendar" class="section">
+  <div class="card">
+    <div class="row"><input id="eventTitle" placeholder="Wydarzenie / wizyta"><input id="eventDate" type="date"></div>
+    <div class="row" style="margin-top:8px"><input id="eventTime" type="time"><input id="eventNote" placeholder="Notatka / miejsce"></div>
+    <div style="margin-top:8px"><button class="action" onclick="addEvent()">Dodaj termin</button></div>
+  </div>
+  <div class="title2">Najbliższe terminy</div><div id="eventList" class="list"></div>
+</section>
+
+<section id="meals" class="section">
+  <div class="card">
+    <div class="row3">
+      <select id="mealDay"><option>Poniedziałek</option><option>Wtorek</option><option>Środa</option><option>Czwartek</option><option>Piątek</option><option>Sobota</option><option>Niedziela</option></select>
+      <select id="mealType"><option>Śniadanie</option><option>Obiad</option><option>Kolacja</option><option>Przekąska</option></select>
+      <input id="mealText" placeholder="Co jemy?">
+    </div>
+    <div style="margin-top:8px"><button class="action" onclick="addMeal()">Dodaj do jadłospisu</button></div>
+  </div>
+  <div class="title2">Jadłospis</div><div id="mealList" class="list"></div>
+</section>
+
+<section id="bills" class="section">
+  <div class="card">
+    <div class="row3"><input id="billName" placeholder="Rachunek"><input id="billAmount" type="number" step=".01" placeholder="Kwota"><input id="billDate" type="date"></div>
+    <div style="margin-top:8px"><button class="action" onclick="addBill()">Dodaj rachunek</button></div>
+  </div>
+  <div class="title2">Rachunki</div><div id="billList" class="list"></div>
+</section>
+
+<section id="savings" class="section">
+  <div class="card">
+    <div class="row"><input id="goalText" placeholder="Cel oszczędnościowy"><input id="goalAmount" type="number" placeholder="Kwota celu"></div>
+    <div class="row" style="margin-top:8px"><input id="goalSaved" type="number" placeholder="Mam już"><input id="goalDate" type="date"></div>
+    <div style="margin-top:8px"><button class="action" onclick="addGoal()">Dodaj cel</button></div>
+  </div>
+  <div class="title2">Oszczędności</div><div id="goalList" class="list"></div>
+</section>
+
+<section id="reports" class="section">
+  <div id="reportLock" class="lock"><b>⭐ Raporty są w Premium</b><div class="hint">Koszty każdego dziecka, kategorie i miesięczne podsumowania.</div><button class="action" style="margin-top:12px" onclick="showPremium()">Zobacz Premium</button></div>
+  <div id="reportContent" style="display:none">
+    <div class="card"><div class="title2" style="margin-top:0">Koszty dzieci</div><select id="reportKid" onchange="renderReports()"></select><canvas id="kidChart" style="margin-top:12px"></canvas></div>
+    <div class="title2">Podsumowanie</div><div id="reportSummary" class="list"></div>
+    <div style="margin-top:12px"><button class="action secondary" onclick="printReport()">Drukuj / zapisz PDF</button></div>
+  </div>
+</section>
+
+<section id="premium" class="section">
+  <div class="card hero" style="text-align:center">
+    <span class="pill premium">PLANER MAMY PREMIUM</span>
+    <div class="price" style="margin-top:10px">12,99 zł</div>
+    <div class="hint">miesięcznie • wersja demonstracyjna</div>
+  </div>
+  <div class="card" style="margin-top:10px">
+    <div class="feature">✓ Raport kosztów każdego dziecka</div>
+    <div class="feature">✓ Wykresy i miesięczne podsumowania</div>
+    <div class="feature">✓ Raport do wydruku / PDF</div>
+    <div class="feature">✓ Więcej niż 2 profile dzieci</div>
+    <div class="feature">✓ Przyszła synchronizacja i przypomnienia</div>
+  </div>
+  <div class="grid2" style="margin-top:10px"><button class="action" onclick="demoPremium()">Włącz Premium — DEMO</button><button class="action secondary" onclick="disablePremium()">Wróć do FREE</button></div>
+</section>
+</main>
+
+<nav id="bottomNav">
+  <button data-go="home" class="active">Dzisiaj</button>
+  <button data-go="budget">Budżet</button>
+  <button data-go="kids">Dzieci</button>
+  <button data-go="planner">Planer</button>
+  <button data-go="calendar">Kalendarz</button>
+  <button data-go="more">Więcej</button>
+</nav>
+
+<div id="moreMenu" style="display:none;position:fixed;left:14px;right:14px;bottom:78px;z-index:12;background:#fffdfb;border:1px solid var(--line);border-radius:18px;padding:10px;box-shadow:0 10px 30px rgba(0,0,0,.12)">
+  <div class="grid2">
+    <button class="action secondary" onclick="goFromMore('shopping')">Zakupy</button>
+    <button class="action secondary" onclick="goFromMore('meals')">Posiłki</button>
+    <button class="action secondary" onclick="goFromMore('bills')">Rachunki</button>
+    <button class="action secondary" onclick="goFromMore('savings')">Oszczędności</button>
+    <button class="action secondary" onclick="goFromMore('reports')">Raporty ⭐</button>
+    <button class="action secondary" onclick="goFromMore('premium')">Premium</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+const KEY='planer_mamy_v5';
+let state=Object.assign({budget:[],kids:[],kidExpenses:[],childEvents:[],childNotes:[],shopping:[],tasks:[],events:[],meals:[],bills:[],goals:[],monthlyBudget:0,monthlyBudgets:{},selectedMonth:'',recurringIncomes:[],recurringBills:[],premium:false,onboarded:false},JSON.parse(localStorage.getItem(KEY)||'{}'));
+const incomeCategoryNames=[
+ 'Wypłata / umowa o pracę','800+','Alimenty','Świadczenia / zasiłki',
+ 'Dodatkowy zarobek','Sprzedaż / zwrot','Inny dochód',
+ 'Wynagrodzenie','Świadczenia','Zwrot / sprzedaż','Inne dochody'
+];
+const expenseCategoryNames=[
+ 'Zakupy spożywcze','Dom i rachunki','Dzieci','Transport','Zdrowie','Ubrania',
+ 'Szkoła','Rozrywka','Subskrypcje','Inne wydatki'
+];
+function cleanCatName(cat=''){
+  return String(cat).replace(/^[^\p{L}\p{N}]+/u,'').trim();
+}
+function normalizeBudgetTypes(){
+  state.budget.forEach(x=>{
+    const c=cleanCatName(x.cat||'');
+    if(expenseCategoryNames.includes(c)) x.type='expense';
+    if(incomeCategoryNames.includes(c)) x.type='income';
+  });
+}
+
+
+const currentMonth=()=>new Date().toISOString().slice(0,7);
+if(!state.selectedMonth) state.selectedMonth=currentMonth();
+if(!state.monthlyBudgets) state.monthlyBudgets={};
+if(state.monthlyBudget && !state.monthlyBudgets[state.selectedMonth]) state.monthlyBudgets[state.selectedMonth]=state.monthlyBudget;
+if(!state.recurringIncomes) state.recurringIncomes=[];
+if(!state.recurringBills) state.recurringBills=[];
+let chart=null;
+const zl=n=>new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN',maximumFractionDigits:2}).format(Number(n||0));
+const esc=s=>(s??'').toString().replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+function save(){localStorage.setItem(KEY,JSON.stringify(state));render()}
+function finishOnboarding(){state.onboarded=true;onboarding.style.display='none';save()}
+if(!state.onboarded) onboarding.style.display='flex';
+
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{if(b.dataset.go==='more'){moreMenu.style.display=moreMenu.style.display==='none'?'block':'none';return}go(b.dataset.go)});
+function go(id){
+  const mm=document.getElementById('moreMenu');
+  if(mm) mm.style.display='none';
+  document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.go===id));
+  document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
+  const target=document.getElementById(id);
+  if(target) target.classList.add('active');
+  if(id==='reports' && typeof renderReports==='function'){
+    try{renderReports();}catch(e){console.error(e);}
+  }
+  try{render();}catch(e){console.error('render',e);}
+}
+function goFromMore(id){go(id)}
+function goIncome(){go('budget');setTimeout(()=>{incomeDateInput.value=new Date().toISOString().slice(0,10);incomeAmountInput.focus();document.getElementById('incomeFormCard').scrollIntoView({behavior:'smooth'});},80)}
+function goExpense(){go('budget');setTimeout(()=>{bDate.value=new Date().toISOString().slice(0,10);bAmount.focus();},80)}
+const expenseCats=[['Zakupy spożywcze','🛒 Zakupy spożywcze'],['Dom i rachunki','🏠 Dom i rachunki'],['Dzieci','👶 Dzieci'],['Transport','🚗 Transport'],['Zdrowie','💊 Zdrowie'],['Ubrania','👗 Ubrania'],['Szkoła','📚 Szkoła'],['Rozrywka','🎉 Rozrywka'],['Inne wydatki','💰 Inne wydatki']];
+const incomeCats=[['Wynagrodzenie','💼 Wynagrodzenie'],['800+','👶 800+'],['Alimenty','🤝 Alimenty'],['Świadczenia','🏦 Świadczenia'],['Dodatkowy zarobek','✨ Dodatkowy zarobek'],['Zwrot / sprzedaż','💸 Zwrot / sprzedaż'],['Inne dochody','💰 Inne dochody']];
+function updateBudgetCategories(preferred){const cats=bType.value==='income'?incomeCats:expenseCats;bCat.innerHTML=cats.map(c=>`<option value="${c[0]}">${c[1]}</option>`).join('');if(preferred&&cats.some(c=>c[0]===preferred))bCat.value=preferred}
+function quickExpense(){go('budget');bType.value='expense';updateBudgetCategories();setTimeout(()=>{bAmount.focus()},80)}
+function changeMonth(v){if(!v)return;state.selectedMonth=v;save()}
+function setMonthlyBudget(){let v=+monthlyBudgetInput.value;if(v<0)return;state.monthlyBudgets[state.selectedMonth]=v;save()}
+
+
+
+
+function addIncome(){
+  const amount=+incomeAmountInput.value;
+  if(!amount || amount<=0){alert('Wpisz kwotę dochodu większą od 0 zł.');incomeAmountInput.focus();return;}
+  let date=incomeDateInput.value || new Date().toISOString().slice(0,10);
+  if(!date.startsWith(state.selectedMonth)) date=`${state.selectedMonth}-01`;
+  const cat=incomeCategory.value;
+  if(expenseCategoryNames.includes(cleanCatName(cat))){alert('Ta kategoria należy do wydatków.');return;}
+  const note=incomeNoteInput.value.trim() || cat;
+  state.budget.unshift({id:Date.now(),type:'income',amount,cat,note,date});
+  if(incomeRecurringInput.checked){
+    const exists=state.recurringIncomes.some(x=>x.name===note && x.amount===amount && x.cat===cat);
+    if(!exists) state.recurringIncomes.push({id:Date.now()+1,name:note,amount,cat});
+  }
+  incomeAmountInput.value='';
+  incomeNoteInput.value='';
+  incomeRecurringInput.checked=false;
+  save();
+}
+
+function addRecurringIncome(){let a=+riAmount.value;if(!riName.value.trim()||!a){alert('Podaj nazwę i kwotę stałego dochodu.');return}state.recurringIncomes.push({id:Date.now(),name:riName.value.trim(),amount:a,cat:riCat.value});riName.value=riAmount.value='';save()}
+function addRecurringBill(){let a=+rbAmount.value,day=Math.min(31,Math.max(1,+rbDay.value||1));if(!rbName.value.trim()||!a){alert('Podaj nazwę i kwotę rachunku.');return}state.recurringBills.push({id:Date.now(),name:rbName.value.trim(),amount:a,day});rbName.value=rbAmount.value=rbDay.value='';save()}
+function delRecurring(kind,id){state[kind]=state[kind].filter(x=>x.id!==id);save()}
+function daysInMonth(ym){let [y,m]=ym.split('-').map(Number);return new Date(y,m,0).getDate()}
+function applyRecurring(){
+  const ym=state.selectedMonth;
+  state.recurringIncomes.forEach(x=>{
+    let key=`ri-${x.id}-${ym}`;
+    if(!state.budget.some(b=>b.recurringKey===key)) state.budget.push({id:Date.now()+Math.random(),type:'income',amount:x.amount,cat:x.cat,note:x.name,date:`${ym}-01`,recurringKey:key});
+  });
+  state.recurringBills.forEach(x=>{
+    let key=`rb-${x.id}-${ym}`,day=String(Math.min(x.day,daysInMonth(ym))).padStart(2,'0');
+    if(!state.budget.some(b=>b.recurringKey===key)) state.budget.push({id:Date.now()+Math.random(),type:'expense',amount:x.amount,cat:'Dom i rachunki',note:x.name,date:`${ym}-${day}`,recurringKey:key});
+  });
+  save();
+  alert('Stałe pozycje zostały dodane do wybranego miesiąca.');
+}
+function addBudget(){
+  let a=+bAmount.value;
+  if(!a||a<=0){alert('Wpisz kwotę większą od 0 zł.');bAmount.focus();return}
+  let d=bDate.value||`${state.selectedMonth}-${String(new Date().getDate()).padStart(2,'0')}`;
+  if(!d.startsWith(state.selectedMonth)) d=`${state.selectedMonth}-01`;
+  const chosenCat=bCat.value||'🧾 Inne wydatki';
+  if(incomeCategoryNames.includes(cleanCatName(chosenCat))){
+    alert('Ta kategoria należy do dochodów. Użyj przycisku „Dodaj dochód”.');
+    return;
+  }
+  state.budget.unshift({id:Date.now(),type:'expense',amount:a,cat:chosenCat,note:bNote.value||'',date:d});
+  bAmount.value='';bNote.value='';updateBudgetCategories();save()
+}
+function addKid(){
+  if(!kidName.value.trim())return;
+  if(!state.premium&&state.kids.length>=2){showPremium();alert('W wersji FREE możesz dodać maksymalnie 2 profile dzieci.');return}
+  state.kids.push({
+    id:Date.now(),
+    name:kidName.value.trim(),
+    info:kidInfo.value.trim(),
+    birth:kidBirth.value||'',
+    photo:pendingNewKidPhoto||''
+  });
+  kidName.value=''; kidInfo.value=''; kidBirth.value='';
+  pendingNewKidPhoto=''; if(typeof kidPhotoStatus!=='undefined')kidPhotoStatus.textContent='';
+  if(typeof kidPhoto!=='undefined')kidPhoto.value='';
+  save();
+}
+function kidBudgetCategory(x){
+  const c=cleanCatName(x.cat||'');
+  return c==='Szkoła'?'📚 Szkoła':'👶 Dzieci';
+}
+function syncKidExpenseToBudget(x){
+  if(!x)return;
+  const kid=(state.kids||[]).find(k=>k.id===x.kidId);
+  const note=x.note||x.what||x.cat||'Wydatek dziecka';
+  let b=(state.budget||[]).find(r=>String(r.kidExpenseId||'')===String(x.id));
+  if(!b){
+    b={id:Date.now()+Math.floor(Math.random()*1000),type:'expense',amount:+x.amount||0,cat:kidBudgetCategory(x),note:(kid?kid.name+': ':'')+note,date:x.date||localISODate(),kidExpenseId:x.id};
+    state.budget.unshift(b);
+  }else{
+    b.type='expense'; b.amount=+x.amount||0; b.cat=kidBudgetCategory(x);
+    b.note=(kid?kid.name+': ':'')+note; b.date=x.date||localISODate();
+  }
+}
+function addKidExpense(){
+  if(!keKid.value||!keAmount.value)return;
+  const x={id:Date.now(),kidId:+keKid.value,cat:keCat.value,amount:+keAmount.value,what:keWhat.value||keCat.value,date:keDate.value||localISODate()};
+  state.kidExpenses.unshift(x);
+  syncKidExpenseToBudget(x);
+  keAmount.value=keWhat.value='';
+  save();
+}
+function addShop(){if(!shopText.value.trim())return;state.shopping.unshift({id:Date.now(),text:shopText.value.trim(),cat:shopCat.value,done:false});shopText.value='';save()}
+function addTask(){if(!taskText.value.trim())return;state.tasks.unshift({id:Date.now(),text:taskText.value.trim(),date:taskDate.value,done:false});taskText.value=taskDate.value='';save()}
+function addEvent(){if(!eventTitle.value.trim()||!eventDate.value)return;state.events.unshift({id:Date.now(),title:eventTitle.value.trim(),date:eventDate.value,time:eventTime.value,note:eventNote.value});eventTitle.value=eventDate.value=eventTime.value=eventNote.value='';save()}
+function addMeal(){if(!mealText.value.trim())return;state.meals.push({id:Date.now(),day:mealDay.value,type:mealType.value,text:mealText.value.trim()});mealText.value='';save()}
+function addBill(){if(!billName.value.trim()||!billAmount.value)return;state.bills.unshift({id:Date.now(),name:billName.value.trim(),amount:+billAmount.value,date:billDate.value,paid:false});billName.value=billAmount.value=billDate.value='';save()}
+function addGoal(){if(!goalText.value.trim())return;state.goals.unshift({id:Date.now(),text:goalText.value.trim(),amount:+goalAmount.value||0,saved:+goalSaved.value||0,date:goalDate.value});goalText.value=goalAmount.value=goalSaved.value=goalDate.value='';save()}
+function del(a,id){state[a]=state[a].filter(x=>x.id!==id);save()}
+function toggle(a,id){let x=state[a].find(x=>x.id===id);if(x)x.done=!x.done;save()}
+function togglePaid(id){let x=state.bills.find(x=>x.id===id);if(x)x.paid=!x.paid;save()}
+function showPremium(){go('premium')}
+function demoPremium(){state.premium=true;save();go('reports')}
+function disablePremium(){state.premium=false;save();go('home')}
+function printReport(){window.print()}
+
+function renderReports(){
+  reportLock.style.display=state.premium?'none':'block';
+  reportContent.style.display=state.premium?'block':'none';
+  if(!state.premium)return;
+  let prev=reportKid.value||'all';
+  reportKid.innerHTML='<option value="all">Wszystkie dzieci</option>'+state.kids.map(k=>`<option value="${k.id}">${esc(k.name)}</option>`).join('');
+  reportKid.value=[...reportKid.options].some(o=>o.value===prev)?prev:'all';
+  const wanted=reportKid.value||'all';let rows=state.kidExpenses.filter(e=>wanted==='all'||String(e.kidId)===wanted);
+  const cats={};rows.forEach(e=>cats[e.cat]=(cats[e.cat]||0)+e.amount);
+  if(chart)chart.destroy();
+  chart=new Chart(document.getElementById('kidChart'),{type:'doughnut',data:{labels:Object.keys(cats),datasets:[{data:Object.values(cats)}]},options:{plugins:{legend:{position:'bottom'}}}});
+  const byKid={};rows.forEach(e=>{let k=state.kids.find(k=>k.id===e.kidId);let n=k?k.name:'Dziecko';byKid[n]=(byKid[n]||0)+e.amount});
+  reportSummary.innerHTML=Object.entries(byKid).map(([n,v])=>`<div class="item"><b>${esc(n)}</b><span class="pill">${zl(v)}</span></div>`).join('')||'<div class="empty">Dodaj wydatki dzieci, aby utworzyć raport.</div>';
+}
+
+
+function localISODate(d=new Date()){
+  const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+function renderToday57(){
+  const t=localISODate();
+  const tomorrow=new Date(); tomorrow.setDate(tomorrow.getDate()+1);
+  const tom=localISODate(tomorrow);
+
+  const tasks=(state.tasks||[]).filter(x=>!x.done && (!x.date || x.date===t));
+  const events=(state.events||[]).filter(x=>x.date===t || x.date===tom);
+  const bills=(state.bills||[]).filter(x=>!x.paid && (x.date===t || x.due===t || x.date===tom || x.due===tom));
+  const shopping=(state.shopping||[]).filter(x=>!x.done);
+
+  today57TaskCount.textContent=tasks.length;
+  today57EventCount.textContent=events.length;
+  today57BillCount.textContent=bills.length;
+  today57ShopCount.textContent=shopping.length;
+
+  today57TaskHint.textContent=tasks.length?`${tasks.length} ${tasks.length===1?'zadanie':'zadań'} na dziś`:'Brak zadań na dziś';
+  today57EventHint.textContent=events.length?`${events.length} ${events.length===1?'termin':'terminy/terminów'} dziś lub jutro`:'Brak terminów dziś i jutro';
+  today57BillHint.textContent=bills.length?`${bills.length} do zapłaty`:'Brak rachunków dziś/jutro';
+  today57ShopHint.textContent=shopping.length?`${shopping.length} ${shopping.length===1?'produkt':'produktów'} na liście`:'Lista zakupów pusta';
+}
+
+
+function refreshKidSelectors(){
+  const opts=(state.kids||[]).map(k=>`<option value="${k.id}">${esc(k.name||'Dziecko')}</option>`).join('');
+  if(typeof kidEventKid!=='undefined' && kidEventKid) kidEventKid.innerHTML=opts||'<option value="">Najpierw dodaj dziecko</option>';
+  if(typeof kidNoteKid!=='undefined' && kidNoteKid) kidNoteKid.innerHTML=opts||'<option value="">Najpierw dodaj dziecko</option>';
+}
+function addKidEvent(){
+  if(!(state.kids||[]).length){alert('Najpierw dodaj profil dziecka.');return;}
+  if(!kidEventTitle.value.trim()){alert('Wpisz nazwę terminu.');return;}
+  if(!kidEventDate.value){alert('Wybierz datę.');return;}
+  const kidId=+kidEventKid.value;
+  const kid=(state.kids||[]).find(k=>k.id===kidId);
+  const e={
+    id:Date.now(),
+    kidId,
+    kidName:kid?kid.name:'',
+    type:kidEventType.value,
+    title:kidEventTitle.value.trim(),
+    date:kidEventDate.value,
+    time:kidEventTime.value||''
+  };
+  state.childEvents.unshift(e);
+  state.events.unshift({
+    id:e.id,
+    title:`${kid?esc(kid.name):'Dziecko'}: ${e.title}`,
+    date:e.date,
+    time:e.time,
+    note:e.type,
+    kidId:e.kidId,
+    source:'childEvent'
+  });
+  kidEventTitle.value='';
+  kidEventTime.value='';
+  save();
+}
+function addKidNote(){
+  if(!(state.kids||[]).length){alert('Najpierw dodaj profil dziecka.');return;}
+  const text=kidNoteText.value.trim();
+  if(!text){alert('Wpisz treść notatki.');return;}
+  const kidId=+kidNoteKid.value;
+  state.childNotes.unshift({id:Date.now(),kidId,text,date:localISODate()});
+  kidNoteText.value='';
+  save();
+}
+
+
+let pendingNewKidPhoto='';
+let pendingEditKidPhoto=null;
+
+function kidAgeText(birth){
+  if(!birth)return '';
+  const d=new Date(birth+'T12:00:00');
+  if(isNaN(d))return '';
+  const n=new Date();
+  let months=(n.getFullYear()-d.getFullYear())*12+(n.getMonth()-d.getMonth());
+  if(n.getDate()<d.getDate())months--;
+  if(months<0)return '';
+  if(months<24)return `${months} mies.`;
+  const years=Math.floor(months/12);
+  return `${years} ${years===1?'rok':(years>=2&&years<=4?'lata':'lat')}`;
+}
+function kidAvatarHtml(k,sizeClass=''){
+  if(k.photo)return `<img class="kidAvatar ${sizeClass}" src="${k.photo}" alt="Zdjęcie ${esc(k.name||'dziecka')}">`;
+  return `<div class="kidAvatarFallback ${sizeClass}">👦</div>`;
+}
+function compressKidPhoto(file,callback){
+  if(!file){callback('');return;}
+  if(!/^image\/(jpeg|png|webp)$/i.test(file.type||'')){
+    alert('Wybierz zdjęcie JPG, PNG albo WEBP.');
+    callback('');
+    return;
+  }
+  const reader=new FileReader();
+  reader.onerror=()=>{alert('Nie udało się wczytać zdjęcia. Spróbuj wybrać je ponownie.');callback('');};
+  reader.onload=()=>{
+    const img=new Image();
+    img.onerror=()=>{alert('Nie udało się odczytać tego zdjęcia. Wybierz inne.');callback('');};
+    img.onload=()=>{
+      const size=180;
+      const c=document.createElement('canvas');
+      c.width=size; c.height=size;
+      const ctx=c.getContext('2d');
+      const s=Math.min(img.naturalWidth||img.width,img.naturalHeight||img.height);
+      const sx=((img.naturalWidth||img.width)-s)/2;
+      const sy=((img.naturalHeight||img.height)-s)/2;
+      ctx.drawImage(img,sx,sy,s,s,0,0,size,size);
+      callback(c.toDataURL('image/jpeg',0.72));
+    };
+    img.src=String(reader.result);
+  };
+  reader.readAsDataURL(file);
+}
+function prepareNewKidPhoto(input){
+  const f=input.files&&input.files[0];
+  if(!f)return;
+  compressKidPhoto(f,data=>{
+    if(!data)return;
+    pendingNewKidPhoto=data;
+    const st=document.getElementById('kidPhotoStatus');
+    if(st)st.textContent='✓ Zdjęcie wybrane — zapisz profil.';
+  });
+}
+function prepareEditKidPhoto(input){
+  const f=input.files&&input.files[0];
+  if(!f)return;
+  compressKidPhoto(f,data=>{
+    if(!data)return;
+    pendingEditKidPhoto=data;
+    const btn=document.getElementById('editKidPhotoStatus');
+    if(btn)btn.textContent='✓ Nowe zdjęcie wybrane — kliknij „Zapisz profil”.';
+  });
+}
+function openKidEdit(){
+  const k=(state.kids||[]).find(x=>x.id===selectedKidHubId);
+  if(!k)return;
+  editKidName.value=k.name||'';
+  editKidInfo.value=k.info||'';
+  editKidBirth.value=k.birth||'';
+  pendingEditKidPhoto=null;
+  const panel=document.getElementById('kidEditPanel');
+  if(!panel)return;
+  panel.classList.add('active');
+  panel.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function closeKidEdit(){
+  const panel=document.getElementById('kidEditPanel');
+  if(panel)panel.classList.remove('active');
+  if(typeof editKidPhoto!=='undefined')editKidPhoto.value='';
+  pendingEditKidPhoto=null;
+  const ps=document.getElementById('editKidPhotoStatus'); if(ps)ps.textContent='';
+}
+function saveKidProfileEdit(){
+  const k=(state.kids||[]).find(x=>x.id===selectedKidHubId);
+  if(!k)return;
+  if(!editKidName.value.trim()){alert('Wpisz imię dziecka.');return;}
+  k.name=editKidName.value.trim();
+  k.info=editKidInfo.value.trim();
+  k.birth=editKidBirth.value||'';
+  if(pendingEditKidPhoto!==null)k.photo=pendingEditKidPhoto;
+  closeKidEdit();
+  save();
+}
+
+let selectedKidHubId=null;
+function toggleKidLegacy(){
+  const w=document.getElementById('kidLegacyWrap');
+  if(!w)return;
+  const isHidden=getComputedStyle(w).display==='none';
+  w.style.display=isHidden?'block':'none';
+  if(isHidden)setTimeout(()=>w.scrollIntoView({behavior:'smooth',block:'start'}),30);
+}
+function selectKidHub(id){
+  selectedKidHubId=+id;
+  renderKidHub();
+}
+function kidHubOpen(kind,id){
+  selectedKidHubId=+id;
+  const wrap=document.getElementById('kidLegacyWrap');
+  if(wrap) wrap.style.display='block';
+
+  const map={
+    expense:['keKid','keAmount'],
+    event:['kidEventKid','kidEventTitle'],
+    note:['kidNoteKid','kidNoteText']
+  };
+  const ids=map[kind];
+  if(!ids)return;
+
+  setTimeout(()=>{
+    const selector=document.getElementById(ids[0]);
+    const field=document.getElementById(ids[1]);
+    if(selector) selector.value=String(id);
+    const target=field||selector;
+    if(target){
+      target.scrollIntoView({behavior:'smooth',block:'center'});
+      setTimeout(()=>{try{target.focus();}catch(e){}},250);
+    }
+  },60);
+}
+
+function openChildExpenseEdit(id){
+  const x=(state.kidExpenses||[]).find(e=>e.id===id);
+  if(!x)return;
+  document.getElementById('editChildExpenseId').value=String(id);
+  document.getElementById('editChildExpenseCat').value=x.cat||'Inne';
+  document.getElementById('editChildExpenseAmount').value=x.amount||'';
+  document.getElementById('editChildExpenseNote').value=x.note||x.what||'';
+  document.getElementById('editChildExpenseDate').value=x.date||localISODate();
+  const panel=document.getElementById('childExpenseEditPanel');
+  panel.classList.add('active');
+  panel.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function closeChildExpenseEdit(){
+  const panel=document.getElementById('childExpenseEditPanel');
+  if(panel)panel.classList.remove('active');
+}
+function saveChildExpenseEdit(){
+  const id=+document.getElementById('editChildExpenseId').value;
+  const x=(state.kidExpenses||[]).find(e=>e.id===id);
+  if(!x)return;
+  const amount=+document.getElementById('editChildExpenseAmount').value;
+  if(!amount || amount<=0){alert('Wpisz kwotę większą od 0 zł.');return;}
+  x.cat=document.getElementById('editChildExpenseCat').value;
+  x.amount=amount;
+  x.note=document.getElementById('editChildExpenseNote').value.trim();
+  x.what=x.note;
+  x.date=document.getElementById('editChildExpenseDate').value||localISODate();
+  syncKidExpenseToBudget(x);
+  closeChildExpenseEdit();
+  save();
+}
+function deleteChildExpense(id){
+  const x=(state.kidExpenses||[]).find(e=>e.id===id);
+  if(!x)return;
+  const label=x.note||x.what||x.cat||'wydatek';
+  if(!confirm(`Usunąć wydatek „${label}” za ${zl(+x.amount||0)}?`))return;
+  state.kidExpenses=(state.kidExpenses||[]).filter(e=>e.id!==id);
+  state.budget=(state.budget||[]).filter(b=>String(b.kidExpenseId||'')!==String(id));
+  closeChildExpenseEdit();
+  save();
+}
+
+function renderKidHub(){
+  const grid=document.getElementById('kidHubGrid');
+  const detail=document.getElementById('kidSelectedDetail');
+  if(!grid||!detail)return;
+  const kids=state.kids||[];
+  if(!kids.length){
+    grid.innerHTML='<div class="empty" style="grid-column:1/-1">Nie ma jeszcze profilu dziecka.</div>';
+    detail.classList.remove('active');
+    return;
+  }
+  if(!selectedKidHubId || !kids.some(k=>k.id===selectedKidHubId)) selectedKidHubId=kids[0].id;
+  grid.innerHTML=kids.map(k=>{
+    const exp=(state.kidExpenses||[]).filter(x=>x.kidId===k.id).reduce((s,x)=>s+(+x.amount||0),0);
+    const upcoming=(state.childEvents||[]).filter(x=>x.kidId===k.id && (x.date||'')>=localISODate()).length;
+    const age=kidAgeText(k.birth);
+    return `<div class="kidHubTile ${k.id===selectedKidHubId?'active':''}" onclick="selectKidHub(${k.id})">
+      <div class="kidTileRow">
+        ${kidAvatarHtml(k)}
+        <div>
+          <div class="kidHubTileName">${esc(k.name||'Dziecko')}</div>
+          <div class="kidHubTileMeta">${age?age+' • ':''}${esc(k.info||'Profil dziecka')}</div>
+          <div class="kidHubTileMeta">${upcoming} terminów • wydatki ${zl(exp)}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const k=kids.find(x=>x.id===selectedKidHubId);
+  const evs=(state.childEvents||[]).filter(x=>x.kidId===k.id && (x.date||'')>=localISODate()).sort((a,b)=>(a.date||'').localeCompare(b.date||'')).slice(0,4);
+  const notes=(state.childNotes||[]).filter(x=>x.kidId===k.id).slice(0,4);
+  const exps=(state.kidExpenses||[]).filter(x=>x.kidId===k.id);
+  const total=exps.reduce((s,x)=>s+(+x.amount||0),0);
+  detail.innerHTML=`<div class="childProfileCard">
+    <div class="kidDetailHead">
+      <div class="kidTileRow">${kidAvatarHtml(k)}<div><div class="childProfileName">${esc(k.name||'Dziecko')}</div><div class="label">${kidAgeText(k.birth)?kidAgeText(k.birth)+' • ':''}${esc(k.info||'Profil dziecka')}</div></div></div>
+      <span class="pill">${zl(total)} wydatków</span>
+    </div>
+    <button class="action secondary" style="margin-top:8px" type="button" onclick="openKidEdit()">✏️ Edytuj profil / zdjęcie</button>
+    <div class="kidActionGrid">
+      <button class="action secondary" type="button" onclick="kidHubOpen('expense',${k.id})">+ Wydatek</button>
+      <button class="action secondary" type="button" onclick="kidHubOpen('event',${k.id})">+ Termin</button>
+      <button class="action secondary" type="button" onclick="kidHubOpen('note',${k.id})">+ Notatka</button>
+    </div>
+    <div class="title2" style="font-size:15px">📅 Najbliższe terminy</div>
+    ${evs.length?evs.map(e=>`<div class="childEventItem"><b>${esc(e.title)}</b><div class="childEventMeta">${esc(e.type)} • ${e.date}${e.time?' • '+e.time:''}</div></div>`).join(''):'<div class="empty">Brak najbliższych terminów.</div>'}
+    <div class="title2" style="font-size:15px">💰 Wydatki dziecka</div>
+    ${exps.length?exps.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(x=>`<div class="childExpenseRow">
+      <div class="childExpenseMain">
+        <b>${esc(x.note||x.what||x.cat||'Wydatek')}</b>
+        <div class="childExpenseMeta">${esc(x.cat||'Inne')} • ${x.date||''} • ${zl(+x.amount||0)}</div>
+      </div>
+      <div class="childExpenseActions">
+        <button type="button" class="action secondary" onclick="event.stopPropagation();openChildExpenseEdit(${x.id})">Edytuj</button>
+        <button type="button" class="danger" onclick="event.stopPropagation();deleteChildExpense(${x.id})">Usuń</button>
+      </div>
+    </div>`).join(''):'<div class="empty">Brak zapisanych wydatków.</div>'}
+    <div class="title2" style="font-size:15px">📝 Ostatnie notatki</div>
+    ${notes.length?notes.map(n=>`<div class="childEventItem">${esc(n.text)}<div class="childEventMeta">${n.date}</div></div>`).join(''):'<div class="empty">Brak notatek.</div>'}
+  </div>`;
+  detail.classList.add('active');
+}
+
+function renderKidProfiles58(){
+  refreshKidSelectors();
+  const kids=state.kids||[];
+  kidProfiles.innerHTML=kids.length?kids.map(k=>{
+    const exps=(state.kidExpenses||[]).filter(x=>x.kidId===k.id);
+    const expTotal=exps.reduce((s,x)=>s+(+x.amount||0),0);
+    const evs=(state.childEvents||[]).filter(x=>x.kidId===k.id).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+    const notes=(state.childNotes||[]).filter(x=>x.kidId===k.id).slice(0,3);
+    const upcoming=evs.filter(x=>(x.date||'')>=localISODate()).slice(0,3);
+    return `<div class="childProfileCard">
+      <div class="childProfileHead">
+        <div><div class="childProfileName">${esc(k.name||'Dziecko')}</div><div class="label">Profil dziecka</div></div>
+        <span class="pill">${upcoming.length} terminów</span>
+      </div>
+      <div class="childMiniGrid">
+        <div class="childMini"><div class="label">Wydatki</div><b>${zl(expTotal)}</b></div>
+        <div class="childMini"><div class="label">Notatki</div><b>${notes.length}</b></div>
+      </div>
+      <div class="title2" style="font-size:15px">Najbliższe terminy</div>
+      ${upcoming.length?upcoming.map(e=>`<div class="childEventItem"><b>${esc(e.title)}</b><div class="childEventMeta">${esc(e.type)} • ${e.date}${e.time?' • '+e.time:''}</div></div>`).join(''):'<div class="empty">Brak najbliższych terminów.</div>'}
+      <div class="title2" style="font-size:15px">Ostatnie notatki</div>
+      ${notes.length?notes.map(n=>`<div class="childEventItem">${esc(n.text)}<div class="childEventMeta">${n.date}</div></div>`).join(''):'<div class="empty">Brak notatek.</div>'}
+    </div>`;
+  }).join(''):'<div class="empty">Dodaj profil dziecka, aby zapisywać terminy i notatki.</div>';
+}
+
+function migrateKidExpensesToBudget(){
+  if(state.kidBudgetSync587)return;
+  (state.kidExpenses||[]).forEach(x=>{
+    const linked=(state.budget||[]).some(b=>String(b.kidExpenseId||'')===String(x.id));
+    if(!linked) syncKidExpenseToBudget(x);
+  });
+  state.kidBudgetSync587=true;
+  localStorage.setItem(KEY,JSON.stringify(state));
+}
+migrateKidExpensesToBudget();
+
+function render(){
+  try{renderKidHub();}catch(e){console.error('Kid hub v5.8.7',e);}
+  try{renderKidProfiles58();}catch(e){console.error('Kids v5.8.7',e);}
+  try{renderToday57();}catch(e){console.error('Today v5.8.7',e);}
+  normalizeBudgetTypes();
+  planBadge.textContent=state.premium?'PREMIUM':'FREE';
+  const ym=state.selectedMonth||currentMonth();
+  homeMonth.value=ym;budgetMonth.value=ym;
+  const [yy,mm]=ym.split('-').map(Number);
+  monthTitle.textContent=new Intl.DateTimeFormat('pl-PL',{month:'long',year:'numeric'}).format(new Date(yy,mm-1,1));
+  const monthRows=state.budget.filter(x=>(x.date||currentMonth()).slice(0,7)===ym);
+  const inc=monthRows.filter(x=>x.type==='income').reduce((a,b)=>a+b.amount,0),exp=monthRows.filter(x=>x.type==='expense').reduce((a,b)=>a+b.amount,0);
+  income.textContent=zl(inc);expenses.textContent=zl(exp);monthLeft.textContent=zl(inc-exp);
+  balance.textContent=zl(inc-exp);homeIncome.textContent=zl(inc);homeExpenses.textContent=zl(exp);homeLeft.textContent=zl(inc-exp);
+
+  let lim=+state.monthlyBudgets[ym]||0;
+  monthlyBudgetInput.value=lim||'';
+  let mp=lim?Math.min(100,Math.round(exp/lim*100)):0;
+  monthlyBudgetBar.style.width=mp+'%';
+  monthlyBudgetHint.textContent=lim?`Wydano ${zl(exp)} z ${zl(lim)} • zostało w limicie ${zl(Math.max(0,lim-exp))}`:'Nie ustawiono limitu dla tego miesiąca.';
+  incomeTotalBig.textContent=zl(inc);
+  incomeSplitTotal.textContent=zl(inc);
+  expenseSplitTotal.textContent=zl(exp);
+  const incomeRows=monthRows.filter(x=>x.type==='income' && !expenseCategoryNames.includes(cleanCatName(x.cat||'')));
+  const incomeCats={};
+  incomeRows.forEach(x=>incomeCats[x.cat]=(incomeCats[x.cat]||0)+x.amount);
+  incomeSourcesSummary.innerHTML=Object.entries(incomeCats).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="incomeSource"><div class="label">${esc(k)}</div><div class="amount">${zl(v)}</div></div>`).join('')||'<div class="empty">Brak dochodów w tym miesiącu.</div>';
+  incomeList.innerHTML=incomeRows.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(x=>`<div class="item"><div><b>${esc(x.note||x.cat)}</b><br><small>${esc(x.cat)} • ${x.date||''}</small></div><div><span class="pill">+ ${zl(x.amount)}</span><button class="danger" onclick="del('budget',${x.id})">×</button></div></div>`).join('')||'<div class="empty">Brak dochodów w tym miesiącu.</div>';
+
+  let pct=inc?Math.min(100,Math.round(exp/inc*100)):0;
+  budgetBar.style.width=pct+'%';
+  budgetHint.textContent=monthRows.length?(inc?`Wydane ${pct}% dochodów w tym miesiącu.`:`Wydatki w miesiącu: ${zl(exp)}.`):'Brak operacji w tym miesiącu.';
+
+  const today=new Date(),isCurrent=ym===currentMonth(),daysLeft=isCurrent?(new Date(today.getFullYear(),today.getMonth()+1,0).getDate()-today.getDate()):0;
+  daysLeftHint.textContent=isCurrent?`Do końca miesiąca: ${daysLeft} dni • średnio możesz wydać ${zl(daysLeft>0?Math.max(0,(lim||inc)-exp)/daysLeft:0)} dziennie.`:'Wyświetlasz inny miesiąc.';
+
+  const todayIso=new Date().toISOString().slice(0,10);
+  bDate.value = bDate.value && bDate.value.startsWith(ym) ? bDate.value : (ym===currentMonth()?todayIso:`${ym}-01`);
+  incomeDateInput.value = incomeDateInput.value && incomeDateInput.value.startsWith(ym) ? incomeDateInput.value : (ym===currentMonth()?todayIso:`${ym}-01`);
+  budgetList.innerHTML=monthRows.filter(x=>x.type==='expense' && !incomeCategoryNames.includes(cleanCatName(x.cat||''))).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(x=>`<div class="item"><div><b>${esc(x.note||x.cat)}</b><br><small>${esc(x.cat)} • ${x.date||''}</small></div><div><span class="pill">- ${zl(x.amount)}</span><button class="danger" onclick="del('budget',${x.id})">×</button></div></div>`).join('')||'<div class="empty">Brak wydatków w tym miesiącu.</div>';
+
+  recurringIncomeList.innerHTML=state.recurringIncomes.map(x=>`<div class="item"><div><b>${esc(x.name)}</b><br><small>${esc(x.cat)}</small></div><div>${zl(x.amount)} <button class="danger" onclick="delRecurring('recurringIncomes',${x.id})">×</button></div></div>`).join('')||'<div class="empty">Brak stałych dochodów.</div>';
+  recurringBillList.innerHTML=state.recurringBills.map(x=>`<div class="item"><div><b>${esc(x.name)}</b><br><small>Termin: ${x.day}. dzień miesiąca</small></div><div>${zl(x.amount)} <button class="danger" onclick="delRecurring('recurringBills',${x.id})">×</button></div></div>`).join('')||'<div class="empty">Brak stałych rachunków.</div>';
+
+  const cat={};monthRows.filter(x=>x.type==='expense').forEach(x=>cat[x.cat]=(cat[x.cat]||0)+x.amount);
+  const maxCat=Math.max(1,...Object.values(cat));
+  categorySummary.innerHTML=Object.entries(cat).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="catRow"><div class="catTop"><span>${esc(k)}</span><b>${zl(v)}</b></div><div class="catTrack"><div class="catFill" style="width:${Math.round(v/maxCat*100)}%"></div></div></div>`).join('')||'<div class="empty">Dodaj wydatki, aby zobaczyć podsumowanie kategorii.</div>';
+
+  kidsList.innerHTML=state.kids.map(k=>`<div class="item"><div><b>${esc(k.name)}</b><br><small>${esc(k.info||'Profil dziecka')}</small></div><button class="danger" onclick="del('kids',${k.id})">×</button></div>`).join('')||'<div class="empty">Dodaj dziecko.</div>';
+  keKid.innerHTML=state.kids.map(k=>`<option value="${k.id}">${esc(k.name)}</option>`).join('');
+  let kt=state.kidExpenses.reduce((a,b)=>a+b.amount,0);kidTotal.textContent=zl(kt);
+  kidExpenseList.innerHTML=state.kidExpenses.slice(0,15).map(e=>{let k=state.kids.find(k=>k.id===e.kidId);return `<div class="item"><div><b>${esc(e.what)}</b><br><small>${esc(k?k.name:'Dziecko')} • ${esc(e.cat)} • ${e.date}</small></div><div>${zl(e.amount)}<button class="danger" onclick="del('kidExpenses',${e.id})">×</button></div></div>`}).join('')||'<div class="empty">Brak kosztów dzieci.</div>';
+
+  shopCount.textContent=state.shopping.filter(x=>!x.done).length;
+  shopList.innerHTML=state.shopping.map(x=>`<div class="item ${x.done?'done':''}"><div><input class="check" type="checkbox" ${x.done?'checked':''} onclick="toggle('shopping',${x.id})"> <b>${esc(x.text)}</b><br><small>${esc(x.cat)}</small></div><button class="danger" onclick="del('shopping',${x.id})">×</button></div>`).join('')||'<div class="empty">Lista pusta.</div>';
+
+  let ts=[...state.tasks].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));taskCount.textContent=ts.filter(x=>!x.done).length;
+  taskList.innerHTML=ts.map(x=>`<div class="item ${x.done?'done':''}"><div><input class="check" type="checkbox" ${x.done?'checked':''} onclick="toggle('tasks',${x.id})"> <b>${esc(x.text)}</b><br><small>${x.date||'Bez daty'}</small></div><button class="danger" onclick="del('tasks',${x.id})">×</button></div>`).join('')||'<div class="empty">Brak zadań.</div>';
+
+  let ev=[...state.events].sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  eventList.innerHTML=ev.map(e=>`<div class="item"><div><b>${esc(e.title)}</b><br><small>${e.date}${e.time?' • '+e.time:''}${e.note?' • '+esc(e.note):''}</small></div><button class="danger" onclick="del('events',${e.id})">×</button></div>`).join('')||'<div class="empty">Brak terminów.</div>';
+
+  mealList.innerHTML=state.meals.map(x=>`<div class="item"><div><b>${esc(x.day)} — ${esc(x.type)}</b><br><small>${esc(x.text)}</small></div><button class="danger" onclick="del('meals',${x.id})">×</button></div>`).join('')||'<div class="empty">Brak posiłków.</div>';
+
+  billCount.textContent=state.bills.filter(x=>!x.paid).length;
+  billList.innerHTML=state.bills.map(x=>`<div class="item ${x.paid?'done':''}"><div><input class="check" type="checkbox" ${x.paid?'checked':''} onclick="togglePaid(${x.id})"> <b>${esc(x.name)}</b><br><small>${x.date||'Bez terminu'}</small></div><div>${zl(x.amount)}<button class="danger" onclick="del('bills',${x.id})">×</button></div></div>`).join('')||'<div class="empty">Brak rachunków.</div>';
+
+  goalList.innerHTML=state.goals.map(g=>{let p=g.amount?Math.min(100,Math.round(g.saved/g.amount*100)):0;return `<div class="card"><div class="item" style="border:0;padding:0"><div><b>${esc(g.text)}</b><br><small>${g.date||'Bez terminu'}</small></div><button class="danger" onclick="del('goals',${g.id})">×</button></div>${g.amount?`<div class="bar" style="margin-top:8px"><div style="width:${p}%"></div></div><div class="hint">${zl(g.saved)} z ${zl(g.amount)} (${p}%)</div>`:''}</div>`}).join('')||'<div class="empty">Brak celów.</div>';
+
+  const todayStr=new Date().toISOString().slice(0,10);
+  let todays=[
+    ...ts.filter(x=>!x.done && x.date===todayStr).map(x=>({t:'Zadanie',n:x.text})),
+    ...ev.filter(x=>x.date===todayStr).map(x=>({t:'Termin',n:x.title})),
+    ...state.bills.filter(x=>!x.paid && x.date===todayStr).map(x=>({t:'Rachunek',n:x.name}))
+  ];
+  todayList.innerHTML=todays.map(x=>`<div class="item"><div><b>${esc(x.n)}</b><br><small>${x.t}</small></div></div>`).join('')||'<div class="empty">Na dziś nic pilnego.</div>';
+
+  if(document.getElementById('reports').classList.contains('active')) renderReports();
+}
+updateBudgetCategories();
+updateBudgetCategories();
+render();
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js?v=53',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
+}
+</script>
+</body>
+</html>
