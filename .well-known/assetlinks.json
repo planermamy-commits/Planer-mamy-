@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "pl.planermamy.mobile",
+      "sha256_cert_fingerprints": [
+        "C6:D3:99:FF:90:23:0B:5C:00:A7:BC:5F:E8:EA:13:75:71:9B:E3:E4:4D:0B:DD:C4:B7:85:6F:D0:E5:30:0E:65"
+      ]
+    }
+  }
+]
